@@ -24,7 +24,7 @@ export const DebugTable = ({ deck }: { deck: Deck }) => {
 
   const handleGradeIndex = (index: number, grade: SuperMemoGrade) => {
     deck.grade(index, grade);
-    deck.dumpToLocalStorage(CURRENT_DECK);
+    deck.saveToLocalStorage(CURRENT_DECK);
     // force update
     setFi((i) => i + 1);
   };

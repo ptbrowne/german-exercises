@@ -48,7 +48,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
   const handleGrade = (grade: SuperMemoGrade) => {
     highlightBackground(grade === 0 ? "bad" : "good");
     deck.grade(index, grade);
-    deck.dumpToLocalStorage(CURRENT_DECK);
+    deck.saveToLocalStorage(CURRENT_DECK);
   };
 
   const handleNext: React.FormEventHandler<HTMLFormElement> = (ev) => {

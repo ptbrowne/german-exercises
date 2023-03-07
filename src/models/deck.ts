@@ -68,16 +68,25 @@ class Deck {
   }
 
   initializeFromLocalStorage(key: string) {
-    const value = localStorage.getItem(`${this.localStoragePrefix}${key}`);
-    if (!value) {
-      console.warn("Nothing in localStorage");
+    const fullKey = `${this.localStoragePrefix}${key}`;
+    try {
+      const value = localStorage.getItem(fullKey);
+      if (!value) {
+        console.warn("Nothing in localStorage");
+        this.cards = [];
+        return;
+      }
+      this.cards = parseCards(value);
+    } catch (e) {
+      console.warn(
+        "Cards could not be recovered from localStorage, clearing localStorage"
+      );
+      localStorage.removeItem(fullKey);
       this.cards = [];
-      return;
     }
-    this.cards = parseCards(value);
   }
 
-  dumpToLocalStorage(key: string) {
+  saveToLocalStorage(key: string) {
     localStorage.setItem(
       `${this.localStoragePrefix}${key}`,
       stringifyCards(this.cards)

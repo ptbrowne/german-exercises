@@ -21,7 +21,7 @@ deck.initializeFromLocalStorage(CURRENT_DECK);
 
 if (deck.cards.length === 0) {
   deck.initializeFromTheme("health-kids");
-  deck.dumpToLocalStorage(CURRENT_DECK);
+  deck.saveToLocalStorage(CURRENT_DECK);
 }
 
 export default function App() {
