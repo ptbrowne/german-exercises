@@ -76,7 +76,7 @@ class Deck {
         this.cards = [];
         return;
       }
-      this.cards = parseCards(value);
+      this.cards = parseCards(value) || [];
     } catch (e) {
       console.warn(
         "Cards could not be recovered from localStorage, clearing localStorage"
