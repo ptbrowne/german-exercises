@@ -4,7 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { makeHoles } from "../models/sentences";
 import { helperRules, prepositionToDeclinations } from "../models/prepositions";
 import Deck from "../models/deck";
-import { useStore } from "../hooks/useStore";
+import { useCardIndexStore, useStore } from "../hooks/useStore";
 import { CURRENT_DECK } from "../App";
 import { detectPrepositions } from "../models/sentences";
 import { HelperRule } from "../models/prepositions";
@@ -26,7 +26,7 @@ const formatHelperRule = (helperRule: HelperRule) => {
 };
 
 const Questions = ({ deck }: { deck: Deck }) => {
-  const { index, setIndex } = useStore((s) => ({
+  const { index, setIndex } = useCardIndexStore((s) => ({
     index: s.cardIndex,
     setIndex: s.setCardIndex,
   }));

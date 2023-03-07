@@ -1,15 +1,30 @@
 import { create } from "zustand";
 import { Theme } from "../models/deck";
 
+import { persist, createJSONStorage } from "zustand/middleware";
+
+export const useCardIndexStore = create<{
+  // Card index
+  cardIndex: number;
+  setCardIndex: (cardIndex: number) => void;
+}>()(
+  persist(
+    (set) => ({
+      cardIndex: 0,
+      setCardIndex: (cardIndex: number) => set({ cardIndex }),
+    }),
+    {
+      name: "polyglotter-card-index",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
 export const useStore = create<{
   // Drawer
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
-
-  // Card index
-  cardIndex: number;
-  setCardIndex: (cardIndex: number) => void;
 
   // Debug
   debug: boolean;
@@ -22,9 +37,6 @@ export const useStore = create<{
   isDrawerOpen: false,
   openDrawer: () => set({ isDrawerOpen: true }),
   closeDrawer: () => set({ isDrawerOpen: false }),
-
-  cardIndex: 0,
-  setCardIndex: (cardIndex: number) => set({ cardIndex }),
 
   debug: false,
   setDebug: (debug) => set({ debug }),
