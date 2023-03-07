@@ -13,12 +13,14 @@ import {
 import { CURRENT_DECK } from "../App";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import Stack from "./Stack";
-import { scaleQuantize } from "d3";
+import { scaleThreshold } from "d3";
 
 export const DebugTable = ({ deck }: { deck: Deck }) => {
   const [, setFi] = useState(0);
 
-  const scale = scaleQuantize().domain([0, 5]).range(["🔴", "🟠", "🟢"]);
+  const scale = scaleThreshold<number, string>()
+    .domain([1, 3.5, 4])
+    .range(["🔴", "🟠", "🟢"]);
 
   const handleGradeIndex = (index: number, grade: SuperMemoGrade) => {
     deck.grade(index, grade);
@@ -31,7 +33,7 @@ export const DebugTable = ({ deck }: { deck: Deck }) => {
       <TableHead>
         <TableRow>
           <TableCell>sentence</TableCell>
-          <TableCell>efactor</TableCell>
+          <TableCell>learned</TableCell>
           <TableCell>interval</TableCell>
           <TableCell>due date</TableCell>
           <TableCell></TableCell>
