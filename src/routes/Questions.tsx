@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { SuperMemoGrade } from "supermemo";
 import { Box, Button, Typography } from "@mui/material";
 import { makeHoles } from "../models/sentences";
@@ -25,6 +25,14 @@ const formatHelperRule = (helperRule: HelperRule) => {
   );
 };
 
+const item = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+  },
+};
+
 const Questions = ({ deck }: { deck: Deck }) => {
   const { index, setIndex } = useCardIndexStore((s) => ({
     index: s.cardIndex,
@@ -35,18 +43,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
   const [showResponse, setShowResponse] = useState(false);
   const currentSentence = deck.cards?.[index];
 
-  const highlightBackground = (className: "good" | "bad") => {
-    const html = document.querySelector("html");
-    if (html) {
-      html.classList.add(className);
-    }
-    setTimeout(() => {
-      html?.classList.remove(className);
-    }, 500);
-  };
-
   const handleGrade = (grade: SuperMemoGrade) => {
-    highlightBackground(grade === 0 ? "bad" : "good");
     deck.grade(index, grade);
     deck.saveToLocalStorage(CURRENT_DECK);
   };
@@ -61,6 +58,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
       setShowResponse(true);
     }
   };
+
   return (
     <Box component="form" sx={{ my: 5 }} onSubmit={handleNext}>
       {currentSentence ? (
