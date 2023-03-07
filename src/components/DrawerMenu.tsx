@@ -52,16 +52,6 @@ export const DrawerMenu = () => {
           >
             Progress
           </Link>
-          <Link
-            underline="hover"
-            component={RRLink}
-            to="/edit"
-            onClick={handleClickLink}
-          >
-            Edit manually
-          </Link>
-          <Divider sx={{ my: 2 }} />
-          <ThemeChooser onChange={() => setCardIndex(deck.getNewIndex())} />
         </Box>
         <Box sx={{ textAlign: "right" }}>
           <Box

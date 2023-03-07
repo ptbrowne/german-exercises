@@ -5,6 +5,7 @@ import dataHealthKids from "../data/health-kids";
 import dataFood from "../data/food";
 import dataRestaurantHotelsBerg from "../data/restaurant-hotels-berg";
 import { addDays } from "date-fns";
+import { parse, stringify } from "superjson";
 
 const sentencesByTheme = {
   "health-kids": dataHealthKids,
@@ -12,8 +13,11 @@ const sentencesByTheme = {
   food: dataFood,
 };
 
+const parseCards = parse<Card[]>;
+const stringifyCards = stringify;
+
 const getDueDate = (interval: number) => {
-  return addDays(new Date(), interval).toISOString();
+  return addDays(new Date(), interval);
 };
 
 export type Theme = keyof typeof sentencesByTheme;
@@ -36,7 +40,7 @@ interface Card {
   interval: number;
   repetition: number;
   efactor: number;
-  dueDate: string;
+  dueDate: Date;
   original: string;
   translation?: string;
 }
@@ -59,7 +63,7 @@ class Deck {
       interval: 0,
       repetition: 0,
       efactor: 2.5,
-      dueDate: new Date().toISOString(),
+      dueDate: new Date(),
     }));
   }
 
@@ -70,13 +74,13 @@ class Deck {
       this.cards = [];
       return;
     }
-    this.cards = JSON.parse(value);
+    this.cards = parseCards(value);
   }
 
   dumpToLocalStorage(key: string) {
     localStorage.setItem(
       `${this.localStoragePrefix}${key}`,
-      JSON.stringify(this.cards)
+      stringifyCards(this.cards)
     );
   }
 
@@ -99,7 +103,7 @@ class Deck {
   }
 
   getNewIndex() {
-    const minIndex = minIndexBy(this.cards, (c) => c.dueDate);
+    const minIndex = minIndexBy(this.cards, (c) => +c.dueDate);
     console.log(minIndex);
     return minIndex;
   }

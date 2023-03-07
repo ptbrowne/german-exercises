@@ -8,6 +8,8 @@ import { useStore } from "../hooks/useStore";
 import { CURRENT_DECK } from "../App";
 import { detectPrepositions } from "../models/sentences";
 import { HelperRule } from "../models/prepositions";
+import Stack from "../components/Stack";
+import { ThemeChooser } from "../ThemeChooser";
 
 const formatHelperRule = (helperRule: HelperRule) => {
   return (
@@ -60,7 +62,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
     }
   };
   return (
-    <form onSubmit={handleNext}>
+    <Box component="form" sx={{ my: 5 }} onSubmit={handleNext}>
       {currentSentence ? (
         <div className="question">
           <Typography variant="body1" gutterBottom>
@@ -93,26 +95,29 @@ const Questions = ({ deck }: { deck: Deck }) => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
           "& > .MuiButtonBase-root + .MuiButtonBase-root": {
             marginLeft: 1,
           },
         }}
       >
-        {showResponse ? (
-          <Button
-            variant="outlined"
-            type="submit"
-            onClick={() => handleGrade(0)}
-          >
-            again
+        <ThemeChooser />
+        <Stack direction="row">
+          {showResponse ? (
+            <Button
+              variant="outlined"
+              type="submit"
+              onClick={() => handleGrade(0)}
+            >
+              again
+            </Button>
+          ) : null}
+          <Button variant="contained" type="submit" ref={nextButtonRef}>
+            {showResponse ? "got it!" : "show answer"}
           </Button>
-        ) : null}
-        <Button variant="contained" type="submit" ref={nextButtonRef}>
-          {showResponse ? "got it!" : "show answer"}
-        </Button>
+        </Stack>
       </Box>
-    </form>
+    </Box>
   );
 };
 

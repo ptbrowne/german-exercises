@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Theme } from "../models/deck";
 
 export const useStore = create<{
   // Drawer
@@ -13,6 +14,10 @@ export const useStore = create<{
   // Debug
   debug: boolean;
   setDebug: (debug: boolean) => void;
+
+  // Theme
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 }>((set) => ({
   isDrawerOpen: false,
   openDrawer: () => set({ isDrawerOpen: true }),
@@ -23,4 +28,7 @@ export const useStore = create<{
 
   debug: false,
   setDebug: (debug) => set({ debug }),
+
+  theme: "health-kids",
+  setTheme: (theme) => set({ theme }),
 }));

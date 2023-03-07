@@ -1,38 +1,31 @@
 import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, Select, MenuItem } from "@mui/material";
 import { allThemes, Theme } from "./models/deck";
 import { deck } from "./App";
+import { useStore } from "./hooks/useStore";
 
-export const ThemeChooser = ({ onChange }: { onChange: () => void }) => {
+export const ThemeChooser = ({ onChange }: { onChange?: () => void }) => {
   const handleChangeTheme = (theme: Theme) => {
     deck.initializeFromTheme(theme);
-    onChange();
+    setTheme(theme);
+    onChange?.();
     document.scrollingElement?.scrollTo(0, 0);
+    closeDrawer();
   };
+  const { closeDrawer, theme, setTheme } = useStore((s) => s);
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        "& > button + button": {
-          marginTop: "0.5rem",
-        },
-      }}
+    <Select
+      size="small"
+      value={theme}
+      onChange={(ev) => handleChangeTheme(ev.target.value as Theme)}
     >
-      <Typography variant="body1" sx={{ mb: 1 }}>
-        Theme
-      </Typography>
       {allThemes.map((theme) => {
         return (
-          <Button
-            variant="outlined"
-            key={theme}
-            onClick={() => handleChangeTheme(theme)}
-          >
+          <MenuItem key={theme} value={theme}>
             {theme.replace(/-/g, " / ")}
-          </Button>
+          </MenuItem>
         );
       })}
-    </Box>
+    </Select>
   );
 };
