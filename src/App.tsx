@@ -44,7 +44,7 @@ export default function App() {
         <DrawerMenu />
       </Box>
 
-      <Box className="App" sx={{ my: 4 }}>
+      <Box className="App" sx={{ my: 4, mx: 2 }}>
         <div className="fullscreen">
           <Outlet />
         </div>
