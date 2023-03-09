@@ -39,7 +39,7 @@ textarea {
 
 .question {
   margin-top: 2rem;
-  min-height: 60vh;
+  height: 300px;
 }
 
 .translation {

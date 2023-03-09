@@ -131,6 +131,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
           "& > .MuiButtonBase-root + .MuiButtonBase-root": {
             marginLeft: 1,
           },
