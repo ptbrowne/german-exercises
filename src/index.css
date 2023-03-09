@@ -31,8 +31,6 @@ body {
 }
 
 textarea {
-  border-radius: var(--spacing-2);
-  margin-bottom: var(--spacing-2);
   border: 2px solid var(--primary-light);
   border-radius: var(--border-radius);
   background: rgba(0, 0, 0, 0.8);
@@ -40,30 +38,23 @@ textarea {
 }
 
 .question {
-  margin: var(--spacing-16) auto;
-  max-width: 80%;
+  margin-top: 2rem;
   min-height: 60vh;
-}
-
-.question > * + * {
-  margin-top: calc(var(--spacing) * 6);
 }
 
 .translation {
   font-size: small;
-  margin-top: var(--spacing-2);
   opacity: 0.8;
 }
 
 .preposition {
   font-size: small;
-  margin-top: var(--spacing-2);
   opacity: 0.8;
 }
 
 .helper-rule {
   margin: var(--spacing-2);
-  padding: 0 var(--spacing-4);
+  padding: 0 1rem;
 }
 
 .fullscreen {

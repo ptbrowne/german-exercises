@@ -84,7 +84,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
   };
 
   return (
-    <Box component="form" sx={{ my: 5 }}>
+    <Box component="form" sx={{ my: 8 }}>
       {currentCard ? (
         <div className="question">
           <Typography variant="body1" gutterBottom>
