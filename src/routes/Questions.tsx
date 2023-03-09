@@ -4,8 +4,11 @@ import { Box, Button, Typography } from "@mui/material";
 import { makeHoles } from "../models/sentences";
 import { helperRules, prepositionToDeclinations } from "../models/prepositions";
 import Deck from "../models/deck";
-import { useCardIndexStore, useStore } from "../hooks/useStore";
-import { CURRENT_DECK } from "../App";
+import {
+  getCurrentDeck,
+  useCardIndexStore,
+  useUIStore,
+} from "../hooks/useStore";
 import { detectPrepositions } from "../models/sentences";
 import { HelperRule } from "../models/prepositions";
 import Stack from "../components/Stack";
@@ -45,7 +48,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
 
   const handleGrade = (grade: SuperMemoGrade) => {
     deck.grade(index, grade);
-    deck.saveToLocalStorage(CURRENT_DECK);
+    deck.saveToLocalStorage();
   };
 
   const handleNext: React.FormEventHandler<HTMLFormElement> = (ev) => {

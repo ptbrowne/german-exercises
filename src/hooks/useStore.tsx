@@ -1,7 +1,34 @@
-import { create } from "zustand";
+import { create, useStore as useZustandStore } from "zustand";
+import { createStore } from "zustand/vanilla";
 import { Theme } from "../models/deck";
 
 import { persist, createJSONStorage } from "zustand/middleware";
+
+export type DeckStore = {
+  // Card index
+  currentDeck: string;
+  setCurrentDeck: (currentDeck: string) => void;
+};
+
+export const currentDeckStore = createStore<DeckStore>()(
+  persist(
+    (set) => ({
+      currentDeck: "health-kids",
+      setCurrentDeck: (currentDeck: string) => set({ currentDeck }),
+    }),
+    {
+      name: "polyglotter-current-deck",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+export const useCurrentDeckStore = <V,>(selector: (state: DeckStore) => V): V =>
+  useZustandStore(currentDeckStore, selector);
+
+export const getCurrentDeck = () => {
+  return currentDeckStore.getState().currentDeck;
+};
 
 export const useCardIndexStore = create<{
   // Card index
@@ -20,7 +47,7 @@ export const useCardIndexStore = create<{
   )
 );
 
-export const useStore = create<{
+export const useUIStore = create<{
   // Drawer
   isDrawerOpen: boolean;
   openDrawer: () => void;
@@ -29,10 +56,6 @@ export const useStore = create<{
   // Debug
   debug: boolean;
   setDebug: (debug: boolean) => void;
-
-  // Theme
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
 }>((set) => ({
   isDrawerOpen: false,
   openDrawer: () => set({ isDrawerOpen: true }),
@@ -40,7 +63,4 @@ export const useStore = create<{
 
   debug: false,
   setDebug: (debug) => set({ debug }),
-
-  theme: "health-kids",
-  setTheme: (theme) => set({ theme }),
 }));

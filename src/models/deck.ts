@@ -6,6 +6,7 @@ import dataFood from "../data/food";
 import dataRestaurantHotelsBerg from "../data/restaurant-hotels-berg";
 import { addDays } from "date-fns";
 import { parse, stringify } from "superjson";
+import { getCurrentDeck } from "../hooks/useStore";
 
 const sentencesByTheme = {
   "health-kids": dataHealthKids,
@@ -67,7 +68,8 @@ class Deck {
     }));
   }
 
-  initializeFromLocalStorage(key: string) {
+  initializeFromLocalStorage() {
+    const key = getCurrentDeck();
     const fullKey = `${this.localStoragePrefix}${key}`;
     try {
       const value = localStorage.getItem(fullKey);
@@ -86,7 +88,8 @@ class Deck {
     }
   }
 
-  saveToLocalStorage(key: string) {
+  saveToLocalStorage() {
+    const key = getCurrentDeck();
     localStorage.setItem(
       `${this.localStoragePrefix}${key}`,
       stringifyCards(this.cards)
@@ -95,7 +98,10 @@ class Deck {
 
   initializeFromTheme(theme: Theme) {
     this.theme = theme;
-    this.initializeFromSentences(sentencesByTheme[this.theme]);
+    this.initializeFromLocalStorage();
+    if (this.cards.length === 0) {
+      this.initializeFromSentences(sentencesByTheme[this.theme]);
+    }
   }
 
   grade(index: number, grade: SuperMemoGrade) {
