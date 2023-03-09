@@ -126,11 +126,6 @@ const Questions = ({ deck }: { deck: Deck }) => {
           </Button>
         </Box>
       )}
-      {round ? (
-        <Typography variant="caption" gutterBottom display="block">
-          Card(s) remaining: {round.length}
-        </Typography>
-      ) : null}
 
       <Box
         sx={{
@@ -141,9 +136,15 @@ const Questions = ({ deck }: { deck: Deck }) => {
           },
         }}
       >
-        <div>
-          Theme: <ThemeChooser />
-        </div>
+        {round ? (
+          <Typography variant="caption" gutterBottom display="block">
+            Card(s) remaining: {round.length}
+          </Typography>
+        ) : (
+          <div>
+            Theme: <ThemeChooser />
+          </div>
+        )}
         {round ? (
           <Stack direction="row">
             {showResponse ? (
