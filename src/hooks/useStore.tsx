@@ -1,6 +1,5 @@
 import { create, useStore as useZustandStore } from "zustand";
 import { createStore } from "zustand/vanilla";
-import { Theme } from "../models/deck";
 
 import { persist, createJSONStorage } from "zustand/middleware";
 

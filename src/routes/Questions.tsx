@@ -1,9 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, FormEvent } from "react";
 import { SuperMemoGrade } from "supermemo";
 import { Box, Button, Typography } from "@mui/material";
 import { makeHoles } from "../models/sentences";
 import { helperRules, prepositionToDeclinations } from "../models/prepositions";
-import Deck from "../models/deck";
+import Deck, { Card, Round } from "../models/deck";
 import {
   getCurrentDeck,
   useCardIndexStore,
@@ -28,6 +28,13 @@ const formatHelperRule = (helperRule: HelperRule) => {
   );
 };
 
+const removeItemAtIndex = <T,>(arr: T[], i: number) => {
+  if (i < 0 || i >= arr.length) {
+    return arr;
+  }
+  return [...arr.slice(0, i), ...arr.slice(i + 1)];
+};
+
 const item = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -41,43 +48,57 @@ const Questions = ({ deck }: { deck: Deck }) => {
     index: s.cardIndex,
     setIndex: s.setCardIndex,
   }));
-  const nextButtonRef = useRef<HTMLButtonElement>(null);
-
   const [showResponse, setShowResponse] = useState(false);
-  const currentSentence = deck.cards?.[index];
+  const [round, setRound] = useState<Round | null>(null);
+  const currentRoundItem = round?.[index];
+  const currentCard = currentRoundItem?.card;
 
   const handleGrade = (grade: SuperMemoGrade) => {
-    deck.grade(index, grade);
+    if (currentRoundItem?.index === undefined || !round) {
+      return;
+    }
+    const newCard = deck.grade(currentRoundItem?.index, grade);
     deck.saveToLocalStorage();
+    console.log(newCard, round, grade);
+    if (grade === 5 && newCard && round) {
+      // Remove card from round
+      const newRound = removeItemAtIndex(round, index);
+      setRound(newRound);
+      const newIndex = index % (newRound.length - 1);
+      console.log({ newIndex });
+      setIndex(newIndex);
+    } else {
+      setIndex((index + 1) % (round?.length - 1));
+    }
+    setShowResponse(false);
   };
 
-  const handleNext: React.FormEventHandler<HTMLFormElement> = (ev) => {
+  const handleShowAnswer = (ev: FormEvent | MouseEvent) => {
     ev.preventDefault();
-    if (showResponse) {
-      handleGrade(5);
-      setIndex(deck.getNewIndex());
-      setShowResponse(false);
-    } else {
-      setShowResponse(true);
-    }
+    setShowResponse(true);
+  };
+
+  const handleStartRound = () => {
+    setRound(deck.getRound());
+    setIndex(0);
   };
 
   return (
-    <Box component="form" sx={{ my: 5 }} onSubmit={handleNext}>
-      {currentSentence ? (
+    <Box component="form" sx={{ my: 5 }}>
+      {currentCard ? (
         <div className="question">
           <Typography variant="body1" gutterBottom>
-            {makeHoles(currentSentence.original)}
+            {makeHoles(currentCard.original)}
           </Typography>
           <Typography variant="body1" color="textSecondary" gutterBottom>
-            {showResponse ? currentSentence.original : null}
+            {showResponse ? currentCard.original : null}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            {showResponse ? currentSentence.translation : null}
+            {showResponse ? currentCard.translation : null}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             {showResponse
-              ? detectPrepositions(currentSentence.original).map((p) => (
+              ? detectPrepositions(currentCard.original).map((p) => (
                   <div className="preposition" key={p}>
                     {p}: {prepositionToDeclinations[p]}
                     {helperRules[p as keyof typeof helperRules] ? (
@@ -92,7 +113,25 @@ const Questions = ({ deck }: { deck: Deck }) => {
               : null}
           </Typography>
         </div>
+      ) : (
+        <Box sx={{ textAlign: "center" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleStartRound}
+            sx={{ mb: 2 }}
+          >
+            Start round
+          </Button>
+        </Box>
+      )}
+      {round ? (
+        <Typography variant="caption" gutterBottom display="block">
+          Card(s) remaining: {round.length}
+        </Typography>
       ) : null}
+
       <Box
         sx={{
           display: "flex",
@@ -102,21 +141,31 @@ const Questions = ({ deck }: { deck: Deck }) => {
           },
         }}
       >
-        <ThemeChooser />
-        <Stack direction="row">
-          {showResponse ? (
-            <Button
-              variant="outlined"
-              type="submit"
-              onClick={() => handleGrade(0)}
-            >
-              again
-            </Button>
-          ) : null}
-          <Button variant="contained" type="submit" ref={nextButtonRef}>
-            {showResponse ? "got it!" : "show answer"}
-          </Button>
-        </Stack>
+        <div>
+          Theme: <ThemeChooser />
+        </div>
+        {round ? (
+          <Stack direction="row">
+            {showResponse ? (
+              <Button variant="outlined" onClick={() => handleGrade(0)}>
+                again
+              </Button>
+            ) : null}
+            {showResponse ? (
+              <Button variant="contained" onClick={() => handleGrade(5)}>
+                got it
+              </Button>
+            ) : null}
+            {showResponse ? null : (
+              <Button
+                variant="contained"
+                onClick={(ev) => handleShowAnswer(ev)}
+              >
+                show answer
+              </Button>
+            )}
+          </Stack>
+        ) : null}
       </Box>
     </Box>
   );

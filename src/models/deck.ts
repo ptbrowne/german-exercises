@@ -7,6 +7,7 @@ import dataRestaurantHotelsBerg from "../data/restaurant-hotels-berg";
 import { addDays } from "date-fns";
 import { parse, stringify } from "superjson";
 import { getCurrentDeck } from "../hooks/useStore";
+import { sortBy } from "remeda";
 
 const sentencesByTheme = {
   "health-kids": dataHealthKids,
@@ -21,6 +22,7 @@ const getDueDate = (interval: number) => {
   return addDays(new Date(), interval);
 };
 
+export type Round = { card: Card; index: number }[];
 export type Theme = keyof typeof sentencesByTheme;
 export const allThemes = Object.keys(sentencesByTheme) as Theme[];
 
@@ -37,7 +39,7 @@ const minIndexBy = <T>(items: T[], by: (t: T) => number | string) => {
   return index;
 };
 
-interface Card {
+export interface Card {
   interval: number;
   repetition: number;
   efactor: number;
@@ -110,17 +112,29 @@ class Deck {
     }
     const oldCard = this.cards[index];
     const newValues = supermemo(this.cards[index], grade);
-    this.cards.splice(index, 1, {
+    const newCard = {
       ...oldCard,
       ...newValues,
       dueDate: getDueDate(newValues.interval),
-    });
+    };
+    this.cards.splice(index, 1, newCard);
+    return newCard;
   }
 
   getNewIndex() {
     const minIndex = minIndexBy(this.cards, (c) => +c.dueDate);
-    console.log(minIndex);
     return minIndex;
+  }
+
+  getRound(limit: number = 10): Round {
+    const cards = sortBy(
+      this.cards.map((c, i) => ({
+        card: c,
+        index: i,
+      })),
+      [(c) => +c.card.dueDate, "asc"]
+    );
+    return cards.slice(0, limit);
   }
 }
 
