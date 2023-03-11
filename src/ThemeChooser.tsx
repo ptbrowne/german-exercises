@@ -5,6 +5,8 @@ import { deck } from "./App";
 import { DeckStore, useCurrentDeckStore, useUIStore } from "./hooks/useStore";
 
 export const ThemeChooser = ({ onChange }: { onChange?: () => void }) => {
+  const { closeDrawer } = useUIStore((s) => s);
+  const { currentDeck, setCurrentDeck } = useCurrentDeckStore((s) => s);
   const handleChangeTheme = (theme: Theme) => {
     deck.initializeFromTheme(theme);
     setCurrentDeck(theme);
@@ -12,8 +14,6 @@ export const ThemeChooser = ({ onChange }: { onChange?: () => void }) => {
     document.scrollingElement?.scrollTo(0, 0);
     closeDrawer();
   };
-  const { closeDrawer } = useUIStore((s) => s);
-  const { currentDeck, setCurrentDeck } = useCurrentDeckStore((s) => s);
   return (
     <Select
       size="small"

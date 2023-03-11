@@ -71,7 +71,8 @@ class Deck {
   }
 
   initializeFromLocalStorage() {
-    const key = getCurrentDeck();
+    const key = getCurrentDeck()!;
+    this.theme = key as Theme;
     const fullKey = `${this.localStoragePrefix}${key}`;
     try {
       const value = localStorage.getItem(fullKey);
@@ -90,12 +91,22 @@ class Deck {
     }
   }
 
+  reset() {
+    this.removeLocalStorage();
+    this.initializeFromLocalStorage();
+  }
+
   saveToLocalStorage() {
     const key = getCurrentDeck();
     localStorage.setItem(
       `${this.localStoragePrefix}${key}`,
       stringifyCards(this.cards)
     );
+  }
+
+  removeLocalStorage() {
+    const key = getCurrentDeck();
+    localStorage.removeItem(`${this.localStoragePrefix}${key}`);
   }
 
   initializeFromTheme(theme: Theme) {
