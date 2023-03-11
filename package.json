@@ -19,6 +19,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
+    "react-spring": "^9.7.1",
     "remeda": "^1.8.1",
     "superjson": "^1.12.2",
     "supermemo": "^2.0.17",

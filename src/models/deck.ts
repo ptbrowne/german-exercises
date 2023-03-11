@@ -118,6 +118,7 @@ class Deck {
       dueDate: getDueDate(newValues.interval),
     };
     this.cards.splice(index, 1, newCard);
+    this.saveToLocalStorage();
     return newCard;
   }
 

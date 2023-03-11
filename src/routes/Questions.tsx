@@ -13,6 +13,7 @@ import { detectPrepositions } from "../models/sentences";
 import { HelperRule } from "../models/prepositions";
 import Stack from "../components/Stack";
 import { ThemeChooser } from "../ThemeChooser";
+import Amazing, { useAmazingRef } from "../components/Amazing";
 
 const formatHelperRule = (helperRule: HelperRule) => {
   return (
@@ -43,13 +44,20 @@ const item = {
   },
 };
 
-const Questions = ({ deck }: { deck: Deck }) => {
+const useRound = ({
+  deck,
+  onGrade,
+  onRoundCompleted,
+}: {
+  deck: Deck;
+  onGrade: () => void;
+  onRoundCompleted: () => void;
+}) => {
+  const [round, setRound] = useState<Round | null>(null);
   const { index, setIndex } = useCardIndexStore((s) => ({
     index: s.cardIndex,
     setIndex: s.setCardIndex,
   }));
-  const [showResponse, setShowResponse] = useState(false);
-  const [round, setRound] = useState<Round | null>(null);
   const currentRoundItem = round?.[index];
   const currentCard = currentRoundItem?.card;
 
@@ -58,29 +66,56 @@ const Questions = ({ deck }: { deck: Deck }) => {
       return;
     }
     const newCard = deck.grade(currentRoundItem?.index, grade);
-    deck.saveToLocalStorage();
-    console.log(newCard, round, grade);
     if (grade === 5 && newCard && round) {
       // Remove card from round
       const newRound = removeItemAtIndex(round, index);
       setRound(newRound);
-      const newIndex = index % (newRound.length - 1);
-      console.log({ newIndex });
-      setIndex(newIndex);
+      if (newRound.length > 0) {
+        setIndex(index % newRound.length);
+      } else {
+        setRound(null);
+        onRoundCompleted();
+      }
     } else {
-      setIndex((index + 1) % (round?.length - 1));
+      setIndex((index + 1) % round?.length);
     }
+    onGrade();
+  };
+
+  const handleStartRound = () => {
+    setRound(deck.getRound(5));
+    setIndex(0);
+  };
+
+  return {
+    start: handleStartRound,
+    currentCard,
+    round,
+    handleGrade,
+    index,
+  };
+};
+
+const Questions = ({ deck }: { deck: Deck }) => {
+  const [showResponse, setShowResponse] = useState(false);
+
+  const onGrade = () => {
     setShowResponse(false);
   };
+
+  const startRef = useAmazingRef();
+
+  const { start, currentCard, round, handleGrade, index } = useRound({
+    deck,
+    onGrade,
+    onRoundCompleted: () => {
+      startRef.current();
+    },
+  });
 
   const handleShowAnswer = (ev: FormEvent | MouseEvent) => {
     ev.preventDefault();
     setShowResponse(true);
-  };
-
-  const handleStartRound = () => {
-    setRound(deck.getRound());
-    setIndex(0);
   };
 
   return (
@@ -119,14 +154,13 @@ const Questions = ({ deck }: { deck: Deck }) => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={handleStartRound}
+            onClick={start}
             sx={{ mb: 2 }}
           >
             Start round
           </Button>
         </Box>
       )}
-
       <Box
         sx={{
           display: "flex",
@@ -169,6 +203,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
           </Stack>
         ) : null}
       </Box>
+      <Amazing startRef={startRef}>🎉</Amazing>
     </Box>
   );
 };

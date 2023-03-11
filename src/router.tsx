@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App, { deck } from "./App";
 import Debug from "./routes/Debug";
 import EditManualTheme from "./routes/EditManualTheme";
+import Playground from "./routes/Playground";
 import Questions from "./routes/Questions";
 
 const router = createBrowserRouter([
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "edit",
         element: <EditManualTheme deck={deck} />,
+      },
+      {
+        path: "playground",
+        element: <Playground />,
       },
     ],
   },
