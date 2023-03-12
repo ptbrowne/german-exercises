@@ -59,6 +59,9 @@ class Deck {
     this.cards = [];
     this.localStoragePrefix = "supermemo_";
     autoSave(this, `deck__${theme}`);
+    if (this.cards.length === 0) {
+      this.initializeFromTheme(this.theme);
+    }
   }
 
   initializeFromSentences(sentences: string) {
@@ -72,40 +75,10 @@ class Deck {
     }));
   }
 
-  // initializeFromLocalStorage() {
-  //   const key = getCurrentDeck()!;
-  //   this.theme = key as Theme;
-  //   const fullKey = `${this.localStoragePrefix}${key}`;
-  //   try {
-  //     const value = localStorage.getItem(fullKey);
-  //     if (!value) {
-  //       console.warn("Nothing in localStorage");
-  //       this.cards = [];
-  //       return;
-  //     }
-  //     this.cards = parseCards(value) || [];
-  //   } catch (e) {
-  //     console.warn(
-  //       "Cards could not be recovered from localStorage, clearing localStorage"
-  //     );
-  //     localStorage.removeItem(fullKey);
-  //     this.cards = [];
-  //   }
-  // }
-
   reset() {
     this.removeLocalStorage();
     this.initializeFromTheme(this.theme);
-    // this.initializeFromLocalStorage();
   }
-
-  // saveToLocalStorage() {
-  //   const key = getCurrentDeck();
-  //   localStorage.setItem(
-  //     `${this.localStoragePrefix}${key}`,
-  //     stringifyCards(this.cards)
-  //   );
-  // }
 
   removeLocalStorage() {
     localStorage.removeItem(`deck__${this.theme}`);

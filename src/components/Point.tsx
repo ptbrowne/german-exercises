@@ -11,6 +11,7 @@ export const Point = ({ children }: { children: React.ReactNode }) => {
       scale: 1,
       y: 0,
       display: "inline-block",
+      fontSize: "2rem",
     },
   }));
 
@@ -32,7 +33,7 @@ export const Point = ({ children }: { children: React.ReactNode }) => {
         await next({
           opacity: 1,
           y: yTarget - bcr?.top,
-          scale: 4,
+          scale: 2,
           rotate: 360,
         });
         await next({ rotate: 0, immediate: true });

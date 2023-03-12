@@ -81,7 +81,7 @@ const Questions = () => {
     onGrade,
     onRoundCompleted: () => {
       startRef.current();
-      deckManager.roundCount = deckManager.roundCount + 1;
+      deckManager.increaseTodayRoundCount();
     },
   });
 
@@ -89,6 +89,8 @@ const Questions = () => {
     ev.preventDefault();
     setShowResponse(true);
   };
+
+  const roundCount = deckManager.todayRoundCount;
 
   return (
     <Box component="form" sx={{ my: 8 }}>
@@ -121,17 +123,22 @@ const Questions = () => {
           </Typography>
         </div>
       ) : (
-        <Box sx={{ textAlign: "center" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={start}
-            sx={{ mb: 2 }}
-          >
-            Start round
-          </Button>
-        </Box>
+        <>
+          <Box sx={{ mb: 2 }}>
+            Theme: <ThemeChooser />
+          </Box>
+          <Box sx={{ textAlign: "center" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={start}
+              sx={{ mb: 2 }}
+            >
+              Start round
+            </Button>
+          </Box>
+        </>
       )}
       <Box
         sx={{
@@ -144,39 +151,35 @@ const Questions = () => {
         }}
       >
         {round ? (
-          <Typography variant="caption" gutterBottom display="block">
-            Card(s) remaining: {round.cards.length}
-          </Typography>
-        ) : (
-          <div>
-            Theme: <ThemeChooser />
-          </div>
-        )}
-        {round ? (
-          <Stack direction="row">
-            {showResponse ? (
-              <Button variant="outlined" onClick={() => handleGrade(0)}>
-                again
-              </Button>
-            ) : null}
-            {showResponse ? (
-              <Button variant="contained" onClick={() => handleGrade(5)}>
-                got it
-              </Button>
-            ) : null}
-            {showResponse ? null : (
-              <Button
-                variant="contained"
-                onClick={(ev) => handleShowAnswer(ev)}
-              >
-                show answer
-              </Button>
-            )}
-          </Stack>
+          <>
+            <Typography variant="caption" gutterBottom display="block">
+              Card(s) remaining: {round.cards.length}
+            </Typography>
+            <Stack direction="row">
+              {showResponse ? (
+                <Button variant="outlined" onClick={() => handleGrade(0)}>
+                  again
+                </Button>
+              ) : null}
+              {showResponse ? (
+                <Button variant="contained" onClick={() => handleGrade(5)}>
+                  got it
+                </Button>
+              ) : null}
+              {showResponse ? null : (
+                <Button
+                  variant="contained"
+                  onClick={(ev) => handleShowAnswer(ev)}
+                >
+                  show answer
+                </Button>
+              )}
+            </Stack>
+          </>
         ) : null}
       </Box>
       <Box sx={{ position: "fixed", bottom: "2rem" }}>
-        {Array(deckManager.roundCount)
+        {Array(roundCount)
           .fill(null)
           .map((_x, i) => {
             return <Point>{(i + 1) % 3 === 0 ? "💫" : "⭐️"}</Point>;
