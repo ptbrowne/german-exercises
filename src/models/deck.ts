@@ -5,7 +5,6 @@ import dataHealthKids from "../data/health-kids";
 import dataFood from "../data/food";
 import dataRestaurantHotelsBerg from "../data/restaurant-hotels-berg";
 import { addDays } from "date-fns";
-import { parse, stringify } from "superjson";
 import { sortBy } from "remeda";
 import { makeAutoObservable } from "mobx";
 import { autoSave } from "./autosave";
@@ -86,7 +85,6 @@ class Deck {
 
   initializeFromTheme(theme: Theme) {
     this.theme = theme;
-    // this.initializeFromLocalStorage();
     if (this.cards.length === 0) {
       this.initializeFromSentences(sentencesByTheme[this.theme]);
     }
@@ -104,7 +102,7 @@ class Deck {
       dueDate: getDueDate(newValues.interval),
     };
     this.cards.splice(index, 1, newCard);
-    // this.saveToLocalStorage();
+
     return newCard;
   }
 
