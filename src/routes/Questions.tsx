@@ -4,16 +4,14 @@ import { Box, Button, Typography } from "@mui/material";
 import { makeHoles } from "../models/sentences";
 import { helperRules, prepositionToDeclinations } from "../models/prepositions";
 import Deck, { Card, Round } from "../models/deck";
-import {
-  getCurrentDeck,
-  useCardIndexStore,
-  useUIStore,
-} from "../hooks/useStore";
+import { useCardIndexStore, useUIStore } from "../hooks/useStore";
 import { detectPrepositions } from "../models/sentences";
 import { HelperRule } from "../models/prepositions";
 import Stack from "../components/Stack";
 import { ThemeChooser } from "../ThemeChooser";
 import Amazing, { useAmazingRef } from "../components/Amazing";
+import { deckManager } from "../models/deck-manager";
+import { Point } from "../components/Point";
 
 const formatHelperRule = (helperRule: HelperRule) => {
   return (
@@ -29,21 +27,6 @@ const formatHelperRule = (helperRule: HelperRule) => {
   );
 };
 
-const removeItemAtIndex = <T,>(arr: T[], i: number) => {
-  if (i < 0 || i >= arr.length) {
-    return arr;
-  }
-  return [...arr.slice(0, i), ...arr.slice(i + 1)];
-};
-
-const item = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-  },
-};
-
 const useRound = ({
   deck,
   onGrade,
@@ -53,38 +36,26 @@ const useRound = ({
   onGrade: () => void;
   onRoundCompleted: () => void;
 }) => {
+  const makeRound = () => {
+    const round = deck.getRound(5);
+    round.onRoundCompleted = () => {
+      onRoundCompleted();
+      setRound(null);
+    };
+    return round;
+  };
+
   const [round, setRound] = useState<Round | null>(null);
-  const { index, setIndex } = useCardIndexStore((s) => ({
-    index: s.cardIndex,
-    setIndex: s.setCardIndex,
-  }));
-  const currentRoundItem = round?.[index];
-  const currentCard = currentRoundItem?.card;
+
+  const currentCard = round?.currentCard;
 
   const handleGrade = (grade: SuperMemoGrade) => {
-    if (currentRoundItem?.index === undefined || !round) {
-      return;
-    }
-    const newCard = deck.grade(currentRoundItem?.index, grade);
-    if (grade === 5 && newCard && round) {
-      // Remove card from round
-      const newRound = removeItemAtIndex(round, index);
-      setRound(newRound);
-      if (newRound.length > 0) {
-        setIndex(index % newRound.length);
-      } else {
-        setRound(null);
-        onRoundCompleted();
-      }
-    } else {
-      setIndex((index + 1) % round?.length);
-    }
+    round?.onGrade(grade);
     onGrade();
   };
 
   const handleStartRound = () => {
-    setRound(deck.getRound(5));
-    setIndex(0);
+    setRound(makeRound());
   };
 
   return {
@@ -92,11 +63,11 @@ const useRound = ({
     currentCard,
     round,
     handleGrade,
-    index,
   };
 };
 
-const Questions = ({ deck }: { deck: Deck }) => {
+const Questions = () => {
+  const deck = deckManager.deck;
   const [showResponse, setShowResponse] = useState(false);
 
   const onGrade = () => {
@@ -105,11 +76,12 @@ const Questions = ({ deck }: { deck: Deck }) => {
 
   const startRef = useAmazingRef();
 
-  const { start, currentCard, round, handleGrade, index } = useRound({
+  const { start, currentCard, round, handleGrade } = useRound({
     deck,
     onGrade,
     onRoundCompleted: () => {
       startRef.current();
+      deckManager.roundCount = deckManager.roundCount + 1;
     },
   });
 
@@ -173,7 +145,7 @@ const Questions = ({ deck }: { deck: Deck }) => {
       >
         {round ? (
           <Typography variant="caption" gutterBottom display="block">
-            Card(s) remaining: {round.length}
+            Card(s) remaining: {round.cards.length}
           </Typography>
         ) : (
           <div>
@@ -203,7 +175,13 @@ const Questions = ({ deck }: { deck: Deck }) => {
           </Stack>
         ) : null}
       </Box>
-      <Amazing startRef={startRef}>🎉</Amazing>
+      <Box sx={{ position: "fixed", bottom: "2rem" }}>
+        {Array(deckManager.roundCount)
+          .fill(null)
+          .map((_x, i) => {
+            return <Point>{(i + 1) % 3 === 0 ? "💫" : "⭐️"}</Point>;
+          })}
+      </Box>
     </Box>
   );
 };

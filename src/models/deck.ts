@@ -6,8 +6,9 @@ import dataFood from "../data/food";
 import dataRestaurantHotelsBerg from "../data/restaurant-hotels-berg";
 import { addDays } from "date-fns";
 import { parse, stringify } from "superjson";
-import { getCurrentDeck } from "../hooks/useStore";
 import { sortBy } from "remeda";
+import { makeAutoObservable } from "mobx";
+import { autoSave } from "./autosave";
 
 const sentencesByTheme = {
   "health-kids": dataHealthKids,
@@ -15,14 +16,13 @@ const sentencesByTheme = {
   food: dataFood,
 };
 
-const parseCards = parse<Card[]>;
-const stringifyCards = stringify;
+// const parseCards = parse<Card[]>;
+// const stringifyCards = stringify;
 
 const getDueDate = (interval: number) => {
   return addDays(new Date(), interval);
 };
 
-export type Round = { card: Card; index: number }[];
 export type Theme = keyof typeof sentencesByTheme;
 export const allThemes = Object.keys(sentencesByTheme) as Theme[];
 
@@ -49,14 +49,16 @@ export interface Card {
 }
 
 class Deck {
-  theme: Theme | null;
+  theme: Theme;
   cards: Card[];
   localStoragePrefix: string;
 
-  constructor() {
-    this.theme = null;
+  constructor(theme: Theme) {
+    makeAutoObservable(this);
+    this.theme = theme;
     this.cards = [];
     this.localStoragePrefix = "supermemo_";
+    autoSave(this, `deck__${theme}`);
   }
 
   initializeFromSentences(sentences: string) {
@@ -70,48 +72,48 @@ class Deck {
     }));
   }
 
-  initializeFromLocalStorage() {
-    const key = getCurrentDeck()!;
-    this.theme = key as Theme;
-    const fullKey = `${this.localStoragePrefix}${key}`;
-    try {
-      const value = localStorage.getItem(fullKey);
-      if (!value) {
-        console.warn("Nothing in localStorage");
-        this.cards = [];
-        return;
-      }
-      this.cards = parseCards(value) || [];
-    } catch (e) {
-      console.warn(
-        "Cards could not be recovered from localStorage, clearing localStorage"
-      );
-      localStorage.removeItem(fullKey);
-      this.cards = [];
-    }
-  }
+  // initializeFromLocalStorage() {
+  //   const key = getCurrentDeck()!;
+  //   this.theme = key as Theme;
+  //   const fullKey = `${this.localStoragePrefix}${key}`;
+  //   try {
+  //     const value = localStorage.getItem(fullKey);
+  //     if (!value) {
+  //       console.warn("Nothing in localStorage");
+  //       this.cards = [];
+  //       return;
+  //     }
+  //     this.cards = parseCards(value) || [];
+  //   } catch (e) {
+  //     console.warn(
+  //       "Cards could not be recovered from localStorage, clearing localStorage"
+  //     );
+  //     localStorage.removeItem(fullKey);
+  //     this.cards = [];
+  //   }
+  // }
 
   reset() {
     this.removeLocalStorage();
-    this.initializeFromLocalStorage();
+    this.initializeFromTheme(this.theme);
+    // this.initializeFromLocalStorage();
   }
 
-  saveToLocalStorage() {
-    const key = getCurrentDeck();
-    localStorage.setItem(
-      `${this.localStoragePrefix}${key}`,
-      stringifyCards(this.cards)
-    );
-  }
+  // saveToLocalStorage() {
+  //   const key = getCurrentDeck();
+  //   localStorage.setItem(
+  //     `${this.localStoragePrefix}${key}`,
+  //     stringifyCards(this.cards)
+  //   );
+  // }
 
   removeLocalStorage() {
-    const key = getCurrentDeck();
-    localStorage.removeItem(`${this.localStoragePrefix}${key}`);
+    localStorage.removeItem(`deck__${this.theme}`);
   }
 
   initializeFromTheme(theme: Theme) {
     this.theme = theme;
-    this.initializeFromLocalStorage();
+    // this.initializeFromLocalStorage();
     if (this.cards.length === 0) {
       this.initializeFromSentences(sentencesByTheme[this.theme]);
     }
@@ -129,7 +131,7 @@ class Deck {
       dueDate: getDueDate(newValues.interval),
     };
     this.cards.splice(index, 1, newCard);
-    this.saveToLocalStorage();
+    // this.saveToLocalStorage();
     return newCard;
   }
 
@@ -139,14 +141,62 @@ class Deck {
   }
 
   getRound(limit: number = 10): Round {
+    return new Round(this, limit, () => undefined);
+  }
+}
+
+export class Round {
+  deck: Deck;
+  cards: { index: number; card: Card }[];
+  index: number;
+  onRoundCompleted: () => void;
+
+  constructor(deck: Deck, limit: number, onRoundCompleted: () => void) {
+    makeAutoObservable(this);
+    this.deck = deck;
+    this.index = 0;
+    this.cards = this.getCards(limit);
+    this.onRoundCompleted = onRoundCompleted;
+  }
+
+  getCards(limit: number) {
     const cards = sortBy(
-      this.cards.map((c, i) => ({
+      this.deck.cards.map((c, i) => ({
         card: c,
         index: i,
       })),
       [(c) => +c.card.dueDate, "asc"]
     );
     return cards.slice(0, limit);
+  }
+
+  get currentItem() {
+    return this.cards?.[this.index];
+  }
+
+  get currentCard() {
+    return this.currentItem?.card;
+  }
+
+  onGrade(grade: SuperMemoGrade) {
+    const currentRoundItem = this.currentItem;
+    if (!currentRoundItem) {
+      return;
+    }
+    const newCard = this.deck.grade(currentRoundItem?.index, grade);
+    const index = this.index;
+    if (grade === 5 && newCard) {
+      // Remove card from round
+      const newCards = this.cards.filter((c, i) => i !== index);
+      this.cards = newCards;
+      if (this.cards.length > 0) {
+        this.index = index % this.cards.length;
+      } else {
+        this.onRoundCompleted();
+      }
+    } else {
+      this.index = (index + 1) % this.cards.length;
+    }
   }
 }
 

@@ -8,25 +8,13 @@ import {
 } from "@mui/material";
 import MoreVert from "@mui/icons-material/MoreVert";
 
-import { dumpExamples } from "./models/sentences";
-import Deck from "./models/deck";
 import { theme } from "./theme";
-import { useCurrentDeckStore, useUIStore } from "./hooks/useStore";
+import { useUIStore } from "./hooks/useStore";
 import { DrawerMenu } from "./components/DrawerMenu";
 import { Outlet } from "react-router-dom";
 
-export const deck = new Deck();
-
-deck.initializeFromLocalStorage();
-
-if (deck.cards.length === 0) {
-  deck.initializeFromTheme("health-kids");
-  deck.saveToLocalStorage();
-}
-
 export default function App() {
-  const { openDrawer, debug } = useUIStore((s) => s);
-  const { currentDeck } = useCurrentDeckStore((s) => s);
+  const { openDrawer } = useUIStore((s) => s);
 
   return (
     <ThemeProvider theme={theme}>

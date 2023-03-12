@@ -11,6 +11,8 @@ specifiers:
   '@vitejs/plugin-react-swc': ^3.0.0
   d3: ^7.8.2
   date-fns: ^2.29.3
+  mobx: ^6.8.0
+  mobx-react-lite: ^3.4.3
   react: ^18.2.0
   react-dom: ^18.2.0
   react-router-dom: ^6.8.2
@@ -30,6 +32,8 @@ dependencies:
   '@types/d3': 7.4.0
   d3: 7.8.2
   date-fns: 2.29.3
+  mobx: 6.8.0
+  mobx-react-lite: 3.4.3_woojb62cqeyk443mbl7msrwu2e
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-router-dom: 6.8.2_biqbaboplfbrettd7655fr4n2y
@@ -1510,6 +1514,28 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
+    dev: false
+
+  /mobx-react-lite/3.4.3_woojb62cqeyk443mbl7msrwu2e:
+    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+    peerDependencies:
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      mobx: 6.8.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /mobx/6.8.0:
+    resolution: {integrity: sha512-+o/DrHa4zykFMSKfS8Z+CPSEg5LW9tSNGTuN8o6MF1GKxlfkSHSeJn5UtgxvPkGgaouplnrLXCF+duAsmm6FHQ==}
     dev: false
 
   /nanoid/3.3.4:

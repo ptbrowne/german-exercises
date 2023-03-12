@@ -1,18 +1,20 @@
 import { Box, Button } from "@mui/material";
 import { DebugTable } from "../components/DebugTable";
-import Deck from "../models/deck";
 import { ThemeChooser } from "../ThemeChooser";
+import { observer } from "mobx-react-lite";
+import { deckManager } from "../models/deck-manager";
 
-const Debug = ({ deck }: { deck: Deck }) => {
+const Debug = observer(() => {
+  const deck = deckManager.deck;
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <ThemeChooser />
         <Button onClick={() => deck.reset()}>reset</Button>
       </Box>
-      <DebugTable deck={deck} />;
+      <DebugTable deck={deck} />
     </>
   );
-};
+});
 
 export default Debug;

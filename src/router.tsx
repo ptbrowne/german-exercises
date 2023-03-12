@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import App, { deck } from "./App";
+import App from "./App";
 import Debug from "./routes/Debug";
 import EditManualTheme from "./routes/EditManualTheme";
 import Playground from "./routes/Playground";
@@ -12,15 +12,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <Questions deck={deck} />,
+        element: <Questions />,
       },
       {
         path: "debug",
-        element: <Debug deck={deck} />,
+        element: <Debug />,
       },
       {
         path: "edit",
-        element: <EditManualTheme deck={deck} />,
+        element: <EditManualTheme />,
       },
       {
         path: "playground",

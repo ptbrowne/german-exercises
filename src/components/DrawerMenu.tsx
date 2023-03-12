@@ -1,14 +1,12 @@
 import React from "react";
 import { Box, Drawer, Divider, Typography } from "@mui/material";
-import { useCardIndexStore, useUIStore } from "../hooks/useStore";
+import { useUIStore } from "../hooks/useStore";
 import { ThemeChooser } from "../ThemeChooser";
 import { Link as RRLink } from "react-router-dom";
 import { Link } from "@mui/material";
-import { deck } from "../App";
 import refinedOtter from "../assets/polyglotter.png";
 
 export const DrawerMenu = () => {
-  const { setCardIndex } = useCardIndexStore();
   const { isDrawerOpen, closeDrawer, debug, setDebug } = useUIStore((s) => s);
   const handleClickLink = () => {
     closeDrawer();

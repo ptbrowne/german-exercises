@@ -1,17 +1,33 @@
+import { Box } from "@mui/material";
+import { useState } from "react";
 import Amazing, { useAmazingRef } from "../components/Amazing";
+import { Point } from "../components/Point";
 
 export default () => {
-  const startRef = useAmazingRef();
+  const [tadaCount, setTadaCount] = useState(0);
   return (
     <>
       <button
         onClick={() => {
-          startRef.current?.();
+          setTadaCount((c) => c + 1);
         }}
       >
-        start
+        +1
       </button>
-      <Amazing startRef={startRef}>🎉</Amazing>
+      <Box
+        sx={{
+          display: "flex",
+          position: "fixed",
+          bottom: "2rem",
+          fontSize: "2rem",
+        }}
+      >
+        {Array(tadaCount)
+          .fill(null)
+          .map((x, i) => (
+            <Point>{(i + 1) % 3 === 0 ? "💫" : "⭐️"}</Point>
+          ))}
+      </Box>
     </>
   );
 };

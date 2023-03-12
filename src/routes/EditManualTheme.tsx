@@ -1,8 +1,12 @@
 import { Button, Box, Typography } from "@mui/material";
-import Deck from "../models/deck";
+import Deck, { Theme } from "../models/deck";
 import { dumpExamples } from "../models/sentences";
+import { observer } from "mobx-react-lite";
+import { deckManager } from "../models/deck-manager";
+import { useState } from "react";
 
-const EditManualTheme = ({ deck }: { deck: Deck }) => {
+const EditManualTheme = observer(() => {
+  const [deck] = useState(() => new Deck("manual" as Theme));
   const handleEdit: React.FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault();
     const form = ev.currentTarget;
@@ -15,6 +19,7 @@ const EditManualTheme = ({ deck }: { deck: Deck }) => {
       return;
     }
     deck.initializeFromSentences(textarea.value);
+    deckManager.theme = "manual" as Theme;
   };
 
   return (
@@ -40,6 +45,6 @@ const EditManualTheme = ({ deck }: { deck: Deck }) => {
       </Box>
     </form>
   );
-};
+});
 
 export default EditManualTheme;

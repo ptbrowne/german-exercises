@@ -14,8 +14,9 @@ import {
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import Stack from "./Stack";
 import { scaleThreshold } from "d3";
+import { observer } from "mobx-react-lite";
 
-export const DebugTable = ({ deck }: { deck: Deck }) => {
+export const DebugTable = observer(({ deck }: { deck: Deck }) => {
   const [, setFi] = useState(0);
 
   const scale = scaleThreshold<number, string>()
@@ -24,13 +25,14 @@ export const DebugTable = ({ deck }: { deck: Deck }) => {
 
   const handleGradeIndex = (index: number, grade: SuperMemoGrade) => {
     deck.grade(index, grade);
-    deck.saveToLocalStorage();
     // force update
     setFi((i) => i + 1);
   };
+
   return (
     <Table>
       <TableBody>
+        {deck.cards.length}
         {sortBy(deck.cards, [(c) => c.dueDate, "desc"]).map((c, i) => {
           return (
             <TableRow key={c.original}>
@@ -71,4 +73,4 @@ export const DebugTable = ({ deck }: { deck: Deck }) => {
       </TableBody>
     </Table>
   );
-};
+});
